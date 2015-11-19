@@ -15,6 +15,7 @@ Data downloaded from:
 library(dplyr)
 library(countrycode)
 library(WDI)
+library(magrittr)
 ```
 
 
@@ -63,7 +64,7 @@ ghg.read %>% group_by(Country) %>%
   select ( lastT) %>% as.vector() %>% unique() %>% print()
 
 ### get the population and GDP-PP
-	idw <- c('NY.GDP.PCAP.PP.CD', 'SP.POP.TOTL')
+	idw <- c('NY.GDP.MKTP.PP.CD', 'SP.POP.TOTL')
 
 	getwbData <- function (ind, countries = data$iso2, end = 2012) {
 		indicator <- WDI(indicator = ind, country = countries, start = 2008, end = end)
@@ -86,6 +87,27 @@ ghg.read %>% group_by(Country) %>%
 	# combine indicators with ghg
   data <- cbind(data, gdp = gdp$values[match(data$iso2, gdp$iso2c)], pop = pop$values[match(data$iso2, pop$iso2c)])
 	
+  # remove all NA
+	data <- data[-unique(which(is.na(data), T)[,1]),]
+	
+	iso2.subset <- c('AT', 'AU', 'KW', 'AE', 'CA', 'US', 'BR', 'RU', 'CN', 'FR', 'IT', 'DE', 'GB', 'SP', 'PT', 'JP', 'TR', 'IN', 'SA', 'MA', 'MX', 'ID', 'ZA', 'EG', 'CH')
+	
+	df <- data %>% filter (iso2 %in% iso2.subset)
+	df$diffGHG  <- round((df$GHG - df$GHG1990) / df$GHG1990, 2) * 100
+	df$GHGperCapita <- round(df$GHG * 10^6 / df$pop,1)
+	df$GHGperGDP_PPP <- round(df$GHG * 10^6 / df$gdp * 10^6)
+	
+	
+	## reformat for datawrapper
+	dw <- df %>% select (Country, iso2, GHG, diffGHG, GHGperCapita, GHGperGDP_PPP)
+	dw %<>% rename (
+	  `Total greenhouse gas emissions (megatonne CO2, 2012)` = GHG, 
+	  `% change in greenhouse gas emissions 1990-2012` = diffGHG,
+	  `Greenhouse gas emissions per capita (tonne CO2 per capita, 2012)` = GHGperCapita,
+		`Greenhouse gas emissions per GDP (tonne CO2 per million USD GDP, 2012)*` = GHGperGDP_PPP
+	  )
+	
+	write.csv(dw, file = "output/ghgEmissions.csv", row.names = F)
 	
 ```
 
