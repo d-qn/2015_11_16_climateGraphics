@@ -7,6 +7,12 @@ library(swiTheme)
 
 data <- read.csv("output/historicalEmissions.csv", stringsAsFactors = F, check.names = F)
 
+trad <- read.csv("output/historicalEmissionsTranslations.csv", check.names = F, stringsAsFactors = F, row.names = 1)
+
+## TMP code to generate the trad file
+# write.csv(data.frame(code = paste0("country.", gsub("( *|\\(|\\))", "", unique(data$Country))), en =  unique(data$Country)),
+#   file = "output/historicalEmissionsTranslations.csv", row.names = F)
+
 
 ############################################################################################
 ###		Settings chart
@@ -15,34 +21,65 @@ data <- read.csv("output/historicalEmissions.csv", stringsAsFactors = F, check.n
 chartHeight <- 450
 
 ############################################################################################
-###		chart data
+###		chart cumulative
 ############################################################################################
 
-## create fancy tooltip as html table
-data$name <- paste0(
-  '<table cellpadding="1" style="line-height:1.4">',
-  '<tr><td><div style="font-size:0.85em"><b>', data$Year, '</b></td></div>',
-  '<td></td><td></td></tr>',
-  '<tr><td colspan="3"><div style="font-size:0.8em">', data$cumulativeShare, " ",
-  "mega tonnes CO2", '</div></td></tr>',
-  '<tr><td align="left" colspan="2"><div style="font-size:0.8em"><i>', data$Country,'</i></td><td></td></tr>',
-  '</table>')
 
-## CHART
-a <- Highcharts$new()
-a$chart(zoomType = "xy", type = 'area', height = chartHeight, spacing = 5)
-hSeries <- hSeries2(data.frame(x = data$Year, y = data$`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`, name = data$Country, series = data$Country), "series")
-a$series(hSeries)
+i <- 2
+
+for (i in 1:ncol(trad)) {
+
+  lang <- colnames(trad)[i]
+
+  dd <- data
+  #country translations
+  countries <- structure(trad[grepl("^country", rownames(trad)), lang], names = paste0("country.", gsub("( *|\\(|\\))", "", unique(data$Country))))
+
+  idx <- match(paste0("country.", gsub("( *|\\(|\\))", "", dd$Country)), names(countries))
+  if(any(is.na(idx))) stop("some country translations cannot be matched")
+  dd$Country <- countries[idx]
+
+  ## create fancy tooltip as html table
+  dd$name <- paste0(
+    '<table cellpadding="1" style="line-height:1.4">',
+    '<tr><td><div style="font-size:0.85em"><b>', dd$Year, '</b></td></div>',
+    '<td></td><td></td></tr>',
+    '<tr><td colspan="3"><div style="font-size:0.8em">', round(dd$`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`), " ",
+    trad['tp.mtco2',lang], '</div></td></tr>',
+    '<tr><td align="left" colspan="2"><div style="font-size:0.8em"><i>', dd$Country,'</i></td><td></td></tr>',
+    '</table>')
+
+  ## CHART
+  a <- Highcharts$new()
+  a$chart(zoomType = "xy", type = 'area', height = chartHeight, spacing = 5)
+  hSeries <- hSeries2(data.frame(
+    x = dd$Year,
+    y = dd$`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`,
+    name = dd$name,
+    series = dd$Country), "series")
+  a$series(hSeries)
+
+  a$colors(swi_pal)
+  a$plotOptions(area = list(stacking = "normal", lineWidth = 0.1, marker = list(enabled = FALSE, symbol = "circle", radius = 1)),
+    series = list(fillOpacity = 1))
+
+  a$legend(borderWidth= 0, itemMarginTop = 3, itemMarginBottom = 5, itemHoverStyle = list(color = '#996666'),
+    itemStyle = list(fontWeight = "normal", fontSize = "0.8em"),
+    title = list(style = list(fontWeight ='normal'),
+    text = paste0(trad['legend.country',lang], ' <span style="font-size: 9px; color: #666; font-weight: normal">',
+    trad['legend.descr',lang], '</span><br>')), style = list(fontStyle = 'italic'))
+
+  a$xAxis(title = list(text = ""), max = max(dd$Year), min = min(dd$Year))
+
+  a$lang( numericSymbols= NULL)
+  a$yAxis(title = list(text = trad['y.lab',lang]), max = max(dd$`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`), gridLineColor = "#EFEFEF",
+          labels = list(formatter = "#! function () {return this.value / 1000;} !#"))
+
+  a$tooltip(formatter = "#! function() { return this.point.name; } !#", useHTML = T , borderWidth = 3, style = list(padding = 4))
 
 
-a$colors(swi_pal)
-a$plotOptions(area = list(stacking = "normal", lineWidth = 0.1, marker = list(enabled = FALSE, symbol = "circle", radius = 1)),
-              series = list(fillOpacity = 1))
 
-
-
-
-
+}
 
 
 
@@ -59,9 +96,7 @@ i <- 1
 
 for (i in 1:ncol(trad)) {
 
-
-
-  ddd <- dd
+  dd <- data
 
   ## Translate country names ##
   ddd[which(ddd$iso2 == "autres"), 'iso2'] <- as.character(trad['iso.others', lang])

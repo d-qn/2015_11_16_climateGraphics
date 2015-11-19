@@ -67,6 +67,9 @@ Whenever global warming is discussed, greenhouse gas emissions is not far. Voici
 **Current greenhouse gas emissions intensities (absolute, % change since 1990, by capita and by GDP-PPP)**
 *http://www.wri.org/resources/data-sets/cait-historical-emissions-data-countries-us-states-unfccc*
 
+`<iframe src="http://charts.swissinfo.ch/xVJcJ/2/" frameborder="0" allowtransparency="true" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen" oallowfullscreen="oallowfullscreen" msallowfullscreen="msallowfullscreen" width="640" height="750"></iframe>`
+
+
 
 
 Currently, developing countries emit the most greenhouse gas. Whether it is in absolute terms or relative. 
