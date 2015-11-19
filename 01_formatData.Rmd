@@ -1,0 +1,93 @@
+---
+title: "Greenhouse gas emissions"
+author: "Duc-Quang Nguyen"
+date: "18 November 2015"
+output: html_document
+---
+
+## data 
+
+Data downloaded from:
+
+[CAIT](http://www.wri.org/resources/data-sets/cait-historical-emissions-data-countries-us-states-unfccc) CAIT Country GHG Emissions - Last updated: 22 June 2015 CSV
+
+```{r, echo=FALSE, message=FALSE}
+library(dplyr)
+library(countrycode)
+library(WDI)
+```
+
+
+
+```{r}
+### Raw data files
+ghg.file <- "data/CAIT_Country_GHG_Emissions_-_csv/CAIT Country GHG Emissions.csv"
+
+soec.file <- "data/CAIT_Country_GHG_Emissions_-_csv/CAIT Country Socio-Economic Data.csv"
+
+### Read data files
+ghg.read <- read.csv(ghg.file, skip = 2, 
+  check.names = F, stringsAsFactors =  F)
+soec.read <- read.csv(soec.file, skip = 1, 
+  check.names = F, stringsAsFactors =  F)
+```
+
+
+### Get only the latest yearly data
+```{r}
+### Total GHG Emissions Excluding Land-Use Change and Forestry (MtCO2e)
+data <- ghg.read %>% group_by(Country) %>% 
+  summarise( GHG = last(`Total GHG Emissions Excluding Land-Use Change and Forestry (MtCO2e)`)) %>% ungroup()
+
+# get the value in 1990
+val1990 <- ghg.read %>% filter(Year == 1990)  %>% group_by(Country) %>% 
+  summarise( val1990 = first(`Total GHG Emissions Excluding Land-Use Change and Forestry (MtCO2e)`)) %>% ungroup()
+
+data <- cbind(data, GHG1990 = val1990$val1990)
+
+# data <- cbind(data, shareManufacturing = (ghg.read %>% group_by(Country) %>% 
+#   summarise( industrial = last(`Manufacturing/Construction (MtCO2)`)) %>% ungroup() %>% select(industrial) / data$GHG) * 100 )
+
+
+## get country iso2 country code
+data$iso2 <- countrycode(data$Country, "country.name", destination = "iso2c")
+
+# NA iso2
+data[which(is.na(data$iso2)),]
+# remove NA countries
+data <- data[which(!is.na(data$iso2)),]
+
+### get the data year 
+ghg.read %>% group_by(Country) %>% 
+  summarise( lastT = last(Year))  %>% ungroup() %>% 
+  select ( lastT) %>% as.vector() %>% unique() %>% print()
+
+### get the population and GDP-PP
+	idw <- c('NY.GDP.PCAP.PP.CD', 'SP.POP.TOTL')
+
+	getwbData <- function (ind, countries = data$iso2, end = 2012) {
+		indicator <- WDI(indicator = ind, country = countries, start = 2008, end = end)
+		colnames(indicator)[3] <- 'values'
+		do.call(rbind, by(indicator, indicator$iso2c, function(ii) {
+			rowx <- !is.na(ii[,3])
+			if(all(!rowx)) {
+				ii[1,]
+			} else if (all(rowx)){
+				ii[which.max(ii$year),]
+			} else {
+				ii[which(rowx)[1],]
+			}
+		}))
+	}
+
+	gdp <- getwbData(idw[1], data$iso2)
+	pop <- getwbData(idw[2], data$iso2)
+
+	# combine indicators with ghg
+  data <- cbind(data, gdp = gdp$values[match(data$iso2, gdp$iso2c)], pop = pop$values[match(data$iso2, pop$iso2c)])
+	
+	
+```
+
+
+
