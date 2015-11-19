@@ -5,11 +5,6 @@ date: "18 November 2015"
 output: html_document
 ---
 
-## data 
-
-Data downloaded from:
-
-[CAIT](http://www.wri.org/resources/data-sets/cait-historical-emissions-data-countries-us-states-unfccc) CAIT Country GHG Emissions - Last updated: 22 June 2015 CSV
 
 ```{r, echo=FALSE, message=FALSE}
 library(dplyr)
@@ -19,22 +14,24 @@ library(magrittr)
 ```
 
 
+## Greenhouse gas emissions 
+
+Data downloaded from:
+
+[CAIT](http://www.wri.org/resources/data-sets/cait-historical-emissions-data-countries-us-states-unfccc) CAIT Country GHG Emissions - Last updated: 22 June 2015 CSV
+
 
 ```{r}
-### Raw data files
+### Raw data file
 ghg.file <- "data/CAIT_Country_GHG_Emissions_-_csv/CAIT Country GHG Emissions.csv"
 
-soec.file <- "data/CAIT_Country_GHG_Emissions_-_csv/CAIT Country Socio-Economic Data.csv"
-
-### Read data files
+### Read data file
 ghg.read <- read.csv(ghg.file, skip = 2, 
-  check.names = F, stringsAsFactors =  F)
-soec.read <- read.csv(soec.file, skip = 1, 
   check.names = F, stringsAsFactors =  F)
 ```
 
 
-### Get only the latest yearly data
+### Greenhouse gas emissions (abs, % change, by GDP and by capita)
 ```{r}
 ### Total GHG Emissions Excluding Land-Use Change and Forestry (MtCO2e)
 data <- ghg.read %>% group_by(Country) %>% 
@@ -111,5 +108,53 @@ ghg.read %>% group_by(Country) %>%
 	
 ```
 
+### Historical carbon emissions
 
+Data downloaded from http://www.wri.org/resources/data-sets/cait-historical-emissions-data-countries-us-states-unfccc
+
+```{r}
+### Raw data files
+hce.file <- "data/CAIT_Country_GHG_Emissions_-_csv/CAIT Country CO2 Emissions.csv"
+
+### Read data files
+hce.read <- read.csv(hce.file, skip = 1, check.names = F, stringsAsFactors =  F)
+hce.read$iso2 <- countrycode(hce.read$Country, "country.name", destination = "iso2c")
+
+# ensure the world value is the same of the sum of non-aggregated countres
+test <- cbind(hce.read %>% filter(Country == "World"), testSum = 
+  hce.read %>% filter(!is.na(iso2)) %>% group_by(Year) %>% 
+  summarise(tot = sum(`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`, na.rm = T)) %>% ungroup() %>% select(tot))
+## IT is NOT the same!
+
+hce.read %>% group_by(Country) %>% 
+  summarise(tot = sum(`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`, na.rm = T)) %>%
+  arrange(desc(tot)) 
+
+country.sub <- c('United States', 'European Union (28)', 'China', 'Russian Federation', 'Japan', 'India', 'Switzerland')
+
+
+hce.sub <- hce.read %>% filter(Country %in% c("World", country.sub))
+# compute "others" values
+world <- hce.sub %>% filter(Country == "World") %>% group_by(Year) %>% summarise(world = `Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`)
+sub.tot <- hce.sub %>% filter(Country != "World") %>% group_by(Year) %>% 
+  summarise(tot = sum(`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`, na.rm = T))
+world$world <- world$world - sub.tot$tot
+world$world <- ifelse(world$world < 0, 0, world$world )
+
+# reassign others value!
+hce.sub[which(hce.sub$Country == "World"), "Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)"]  <- world$world
+hce.sub[which(hce.sub$Country == "World"), 'Country'] <- "others"
+
+
+# replace NA emissions by 0
+hce.sub[is.na(hce.sub[,3]),3] <- 0
+
+# compute the cumulative sum
+hce.sub %<>% group_by(Country) %>% mutate(cumulative = cumsum(`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`)) %>% ungroup()
+
+# compute the cumulative share
+hce.sub %<>%  group_by(Year) %>% mutate(cumulativeShare = (cumulative / sum(cumulative)) * 100)  %>% ungroup()
+
+
+write.csv(hce.sub, file = "output/historicalEmissions.csv", row.names = F)
 
