@@ -33,7 +33,11 @@ ghg.read <- read.csv(ghg.file, skip = 2,
 
 ### Greenhouse gas emissions (abs, % change, by GDP and by capita)
 ```{r}
-### Total GHG Emissions Excluding Land-Use Change and Forestry (MtCO2e)
+
+reGetAndComputeThis <- FALSE
+
+if(reGetAndComputeThis) {
+  ### Total GHG Emissions Excluding Land-Use Change and Forestry (MtCO2e)
 data <- ghg.read %>% group_by(Country) %>% 
   summarise( GHG = last(`Total GHG Emissions Excluding Land-Use Change and Forestry (MtCO2e)`)) %>% ungroup()
 
@@ -105,7 +109,8 @@ ghg.read %>% group_by(Country) %>%
 	  )
 	
 	write.csv(dw, file = "output/ghgEmissions.csv", row.names = F)
-	
+}
+
 ```
 
 ### Historical carbon emissions
@@ -147,14 +152,103 @@ hce.sub[which(hce.sub$Country == "World"), 'Country'] <- "others"
 
 
 # replace NA emissions by 0
-hce.sub[is.na(hce.sub[,3]),3] <- 0
-
-# compute the cumulative sum
-hce.sub %<>% group_by(Country) %>% mutate(cumulative = cumsum(`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`)) %>% ungroup()
+hce.sub[is.na(hce.sub[,3]), 3] <- 0
 
 # compute the cumulative share
-hce.sub %<>%  group_by(Year) %>% mutate(cumulativeShare = (cumulative / sum(cumulative)) * 100)  %>% ungroup()
+hce1 <- hce.sub %>%  group_by(Year) %>% mutate(cumulativeShare = (`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)` / sum(`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`)) * 100)  %>% ungroup()
+
+write.csv(hce1, file = "output/historicalEmissions.csv", row.names = F)
+
+# compute the cumulative share by country over the whole timeframe
+hce2 <- hce.sub %>%  group_by(Country) %>% summarise(total =  sum(`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`))  %>% ungroup()
+hce2$perc <- (hce2$total / sum(hce2$total)) * 100
+write.csv(hce2, file = "output/cumulativeHistoricalEmissions.csv", row.names = F)
+
+# compute the cumulative world emissions 
+hce.w <- hce.read %>%  filter(Country == "World") %>% select(-iso2)
+hce.w$cumsum <- cumsum(hce.w$`Total CO2 Emissions Excluding Land-Use Change and Forestry (MtCO2)`)
+
+```
 
 
-write.csv(hce.sub, file = "output/historicalEmissions.csv", row.names = F)
 
+
+## Greenhouse gas emissions by sectors
+
+Data downloaded from:
+[CAIT](http://www.wri.org/resources/data-sets/cait-historical-emissions-data-countries-us-states-unfccc) CAIT Country GHG Emissions - Last updated: 22 June 2015 CSV
+
+
+```{r}
+### Raw data file
+ghs.file <- "data/CAIT_Country_GHG_Emissions_-_csv/CAIT Country CO2 Emissions-Energy Sub-Sector.csv"
+
+### Read data file
+ghs.read <- read.csv(ghs.file, skip = 1, 
+  check.names = F, stringsAsFactors =  F)
+
+ghs.read %>% group_by(Country) %>% summarise(maxYear = max(Year)) %>% select(maxYear) %>% unique()
+
+country.sub <- c("Switzerland", "European Union (28)", "United States", "China", 
+  "Brazil", "Japan", "India", "Morocco")
+
+ghs <- ghs.read %>% filter(Year == 2012, Country %in% country.sub) %>% select(-Year)
+# merge Other Fuel Combustion (CO2) (MtCO2) & Fugitive Emissions (CO2) (MtCO2)
+ghs <- dplyr::bind_cols(
+  ghs %>% select(-`Other Fuel Combustion (CO2) (MtCO2)`, -`Fugitive Emissions (CO2) (MtCO2)`),
+  transmute(ghs, Other = `Other Fuel Combustion (CO2) (MtCO2)` + `Fugitive Emissions (CO2) (MtCO2)`)
+)
+
+write.csv(ghs[match(country.sub, ghs$Country), ], file = "output/ghg_energy_subsectorEmissions.csv", row.names = F)
+```
+
+
+## Greenhouse gas emissions by energy subsectors
+
+Data downloaded from:
+[CAIT](http://www.wri.org/resources/data-sets/cait-historical-emissions-data-countries-us-states-unfccc) CAIT Country GHG Emissions - Last updated: 22 June 2015 CSV
+
+
+```{r}
+### Raw data file
+ghs.file <- "data/CAIT_Country_GHG_Emissions_-_csv/CAIT Country CO2 Emissions-Energy Sub-Sector.csv"
+
+### Read data file
+ghs.read <- read.csv(ghs.file, skip = 1, 
+  check.names = F, stringsAsFactors =  F)
+
+ghs.read %>% group_by(Country) %>% summarise(maxYear = max(Year)) %>% select(maxYear) %>% unique()
+
+country.sub <- c("Switzerland", "European Union (28)", "United States", "China", 
+  "Brazil", "Japan", "India", "Morocco")
+
+ghs <- ghs.read %>% filter(Year == 2012, Country %in% country.sub) %>% select(-Year)
+# merge Other Fuel Combustion (CO2) (MtCO2) & Fugitive Emissions (CO2) (MtCO2)
+ghs <- dplyr::bind_cols(
+  ghs %>% select(-`Other Fuel Combustion (CO2) (MtCO2)`, -`Fugitive Emissions (CO2) (MtCO2)`),
+  transmute(ghs, Other = `Other Fuel Combustion (CO2) (MtCO2)` + `Fugitive Emissions (CO2) (MtCO2)`)
+)
+
+write.csv(ghs[match(country.sub, ghs$Country), ], file = "output/ghg_energy_subsectorEmissions.csv", row.names = F)
+```
+
+
+## CO2 emissions per capita territorial vs consumption
+
+Data export from:
+[Global Carbon Atlas](http://www.globalcarbonatlas.org/?q=en/emissions)
+
+
+```{r}
+### Raw data file
+gca.file <- "data/globalCarbonAtlas/consumptionTransfer_2012.csv"
+
+### Read data file
+gca.read <- read.csv(gca.file,
+  check.names = F, stringsAsFactors =  F)
+
+country.sub <- c("Switzerland", "Italy", "France", "Germany", "United Kingdom", "United States of America", "Japan", "Spain", "China", "India")
+
+gca <- gca.read %>% filter(Country %in% country.sub) %>% select(Country, `Territorial emissions in tCO₂ per person (2012)`, `Consumption emissions in tCO₂ per person (2012)`)
+write.csv(gca[match(country.sub, gca$Country), ], file = "output/consumptionTransfer_carbonEmissions.csv", row.names = F)
+```
