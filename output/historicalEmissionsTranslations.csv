@@ -1,17 +1,17 @@
 code,en,fr,de,it,pt,zh,ru,es,ja,ar
-country.China,China,Chine,China,Cina,China,中国,Китай,China,中国,
-country.EuropeanUnion28,European Union (28),Union européenne (UE28),Europäische Union (EU 28),Unione europea (UE 28),União Europeia (UE 28),欧盟(28国),Евросоюз,Unión Europea (UE 28),EU28カ国,
-country.India,India,Inde,Indien,India,Índia,印度,Индия ,India,インド,
-country.Japan,Japan,Japon,Japan,Giappone,Japão,日本,Япония,Japón,日本,
-country.RussianFederation,Russian Federation,Fédération de Russie,Russische Föderation,Russia,Federação da Rússia,俄罗斯,Российская Федерация,Federación Rusa,ロシア,
-country.Switzerland,Switzerland,Suisse,Schweiz,Svizzera,Suíça,瑞士,Швейцария,Suiza,スイス,
-country.UnitedStates,United States,Etats-Unis,USA,Stati Uniti,Estados Unidos,美国,США,Estados Unidos,米国,
-country.others,Other countries,Autres pays,andere Länder,Altri paesi,Outros países,其他国家,Другие страны,Otros países,その他の国,
-tp.mtco2,mega tonnes CO2,mega tonnes CO2,Megatonnen CO2,milioni di tonnellate di CO2,megatoneladas de CO2 ,万亿吨CO2,СО2 в мегатоннах,megatoneladas CO2,CO2量　メガトン（100万トン）,
-legend.country,Countries,Pays,Länder,Paesi,Países,国家,Страны,Países,国,
-legend.descr,(Click to hide),(Cliquez pour masquer),(Mit Klick verbergen),(Cliccare per nascondere),(clicar para esconder),(点击隐藏),"(Нажать, чтобы скрыть)",(Cliquee para ocultar),（クリックすると隠れます）,
-y.title,Billion tons CO2,Milliards de tonnes de CO2,Milliarden Tonnen CO2,Miliardi di tonnellate di CO2,Bilhões de toneladas de CO2,10亿吨CO2,СО2 в млрд тонн,Miles de millones de toneladas de CO2,CO2量　10億トン,
-title,Total CO2 emissions 1850-2012,Emissions totales de CO2 1850-2012,Gesamter CO2-Ausstoss 1850-2012,Totale delle emissioni di CO2 1850-2012,Total de emissões de CO2 entre 1850-2012,1850-2012年全部CO2排放量,Общая эмиссия СО2 1850-2012 гг.,Total de emisiones de CO2 (1850-2012),1850~2012年のCO2総排出量,
-description,Excluding Land-Use Change and Forestry,A l'exclusion des émissions résultant de la réaffectation des sols et de la sylviculture,Ohne Landnutzungsänderungen und Forstwirtschaft,Escluso il settore agricolo e forestale,Excluíndo alterações do uso do solo e silvicultura,不包括土地利用变化和林业,Без учета изменений в порядке землепользовании и в лесном хозяйстве,Excluidos el cambio del uso de la tierra y la silvicultura,土地利用変化および林業分野における排出・吸収量は除く,
-source,source,source,Quelle,fonte,fonte,来源,Источник,Fuente,出典,
-sourceName,CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,气候数据浏览器(CAIT),CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,
+country.China,China,Chine,China,Cina,China,中国,Китай,China,中国,الصين
+country.EuropeanUnion28,European Union (28),Union européenne (UE28),Europäische Union (EU 28),Unione europea (UE 28),União Europeia (UE 28),欧盟(28国),Евросоюз,Unión Europea (UE 28),EU28カ国,الاتحاد الأوروبي (28)
+country.India,India,Inde,Indien,India,Índia,印度,Индия ,India,インド,الهند
+country.Japan,Japan,Japon,Japan,Giappone,Japão,日本,Япония,Japón,日本,اليابان
+country.RussianFederation,Russian Federation,Fédération de Russie,Russische Föderation,Russia,Federação da Rússia,俄罗斯,Российская Федерация,Federación Rusa,ロシア,روسيا الاتحادية
+country.Switzerland,Switzerland,Suisse,Schweiz,Svizzera,Suíça,瑞士,Швейцария,Suiza,スイス,سويسرا
+country.UnitedStates,United States,Etats-Unis,USA,Stati Uniti,Estados Unidos,美国,США,Estados Unidos,米国,الولايات المتحدة
+country.others,Other countries,Autres pays,andere Länder,Altri paesi,Outros países,其他国家,Другие страны,Otros países,その他の国,بلدان أخرى
+tp.mtco2,mega tonnes CO2,mega tonnes CO2,Megatonnen CO2,milioni di tonnellate di CO2,megatoneladas de CO2 ,万亿吨CO2,СО2 в мегатоннах,megatoneladas CO2,CO2量　メガトン（100万トン）,ميغا طن من ثاني أوكسيد الكربون
+legend.country,Countries,Pays,Länder,Paesi,Países,国家,Страны,Países,国,بلدان
+legend.descr,(Click to hide),(Cliquez pour masquer),(Mit Klick verbergen),(Cliccare per nascondere),(clicar para esconder),(点击隐藏),"(Нажать, чтобы скрыть)",(Cliquee para ocultar),（クリックすると隠れます）,(اضغط للإخفاء)
+y.title,Billion tons CO2,Milliards de tonnes de CO2,Milliarden Tonnen CO2,Miliardi di tonnellate di CO2,Bilhões de toneladas de CO2,10亿吨CO2,СО2 в млрд тонн,Miles de millones de toneladas de CO2,CO2量　10億トン,بلايين الأطنان من ثاني أوكسيد الكربون
+title,Total CO2 emissions 1850-2012,Emissions totales de CO2 1850-2012,Gesamter CO2-Ausstoss 1850-2012,Totale delle emissioni di CO2 1850-2012,Total de emissões de CO2 entre 1850-2012,1850-2012年全部CO2排放量,Общая эмиссия СО2 1850-2012 гг.,Total de emisiones de CO2 (1850-2012),1850~2012年のCO2総排出量,إجمالي انبعاثات ثاني أوكسيد الكربون 1850-2012
+description,Excluding Land-Use Change and Forestry,A l'exclusion des émissions résultant de la réaffectation des sols et de la sylviculture,Ohne Landnutzungsänderungen und Forstwirtschaft,Escluso il settore agricolo e forestale,Excluíndo alterações do uso do solo e silvicultura,不包括土地利用变化和林业,Без учета изменений в порядке землепользовании и в лесном хозяйстве,Excluidos el cambio del uso de la tierra y la silvicultura,土地利用変化および林業分野における排出・吸収量は除く,باستثناء تعديلات استغلال الأراضي والغابات
+source,source,source,Quelle,fonte,fonte,来源,Источник,Fuente,出典,المصدر
+sourceName,CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,气候数据浏览器(CAIT),CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015,CAIT Climate Data Explorer 2015
